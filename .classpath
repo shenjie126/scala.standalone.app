@@ -23,5 +23,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/progfun-example/lib_managed/jars/junit/junit/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="/progfun-example/lib_managed/jars/org.scalatest/scalatest_2.10/scalatest_2.10-1.9.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
