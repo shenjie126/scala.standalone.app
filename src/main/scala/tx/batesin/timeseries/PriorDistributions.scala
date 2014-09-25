@@ -7,19 +7,16 @@ import org.apache.commons.math3.random.{MersenneTwister, RandomGenerator}
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicInteger
-
+import java.math.BigDecimal;
 /** 先验分布采样 */
 
 class PriorDistributions(pi: Double,k: Int,b: DenseVector[Double],x:DenseMatrix[Double],k_n: Double,w: Double,weight: Double,ss: Double){
   
-  def r = PriorDistributions.draw_r(pi,k)
-  def sigame2 = 1/PriorDistributions.draw_sigma_r(weight,ss)
-  def b_r = PriorDistributions.gen_vector_b(r,b)
-  def x_r = PriorDistributions.gen_oumu_r(r,x)
-  println(r)
-  println(b_r)
-  println(x_r)
-  def r_nozero = {
+  val r = PriorDistributions.draw_r(pi,k)
+  val sigame2 = 1/PriorDistributions.draw_sigma_r(weight,ss)
+  val b_r = PriorDistributions.gen_vector_b(r,b)
+  val x_r = PriorDistributions.gen_matrix_r(r,x)
+  val r_nozero = {
 	 var i = 0
      r.foreach(e => if(e != 0.0){
      i = i + 1
@@ -27,7 +24,7 @@ class PriorDistributions(pi: Double,k: Int,b: DenseVector[Double],x:DenseMatrix[
   	i
   }
   
-  def beta = PriorDistributions.draw_beta_sigmar(b_r,PriorDistributions.gene_Covariance(x_r,k_n,w,sigame2))
+  val beta = PriorDistributions.draw_beta_sigmar(b_r,PriorDistributions.gene_Covariance(x_r,k_n,w,sigame2))
   
   def draw(): DenseVector[Double] = {
     val priorVector = DenseVector.zeros[Double](k + r_nozero + 1)
@@ -73,32 +70,36 @@ object PriorDistributions {
   }
   /** 生成  P(beta|sigma,r) (beta1,beta2,beta3...betak) */
   def draw_beta_sigmar(mean: DenseVector[Double],covariance : DenseMatrix[Double]): DenseVector[Double] = {
-    println(covariance)
-    println(mean)
-  	val mutil_Gaussian_model = MultivariateGaussian(mean,covariance)(new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(System.currentTimeMillis()))))
+
+  	val mutil_Gaussian_model = MultivariateGaussian(mean,PriorDistributions.formatMatrix(covariance))(new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(System.currentTimeMillis()))))
     mutil_Gaussian_model.draw()
   }
   
-  def gen_oumu_r(r: DenseVector[Double],x:DenseMatrix[Double]): DenseMatrix[Double] = {
+  def gen_matrix_r(r: DenseVector[Double], x:DenseMatrix[Double]): DenseMatrix[Double] = {
     val x_r = DenseMatrix.zeros[Double](x.rows, x.cols)
     var r_nozero_size = 0
     
-    r.foreachPair((index,e) => if(e != 0.0){
-      x_r(:: , r_nozero_size) := x(::,index)
-      r_nozero_size = r_nozero_size + 1
-    })
+    for( i <- 0 until r.length){
+        if(r(i) != 0.0){
+          x_r(:: , r_nozero_size) := x(::,i)
+          r_nozero_size = r_nozero_size + 1
+        }
+     }
     
+    require( r_nozero_size >0)
     x_r(::,0 to r_nozero_size - 1)
   }
   
   def gen_vector_b(r: DenseVector[Double],b: DenseVector[Double]): DenseVector[Double] = {
     val b_r = DenseVector.zeros[Double](r.length)
     var r_nozero_size = 0
-    r.foreachPair((index,e) => if(e != 0.0){
-      b_r.update(r_nozero_size, b(index))
-      r_nozero_size = r_nozero_size + 1
-    })
-
+    for( i <- 0 until r.length){
+        if(r(i) != 0.0){
+          b_r.update(i, b(i))
+          r_nozero_size = r_nozero_size + 1
+        }
+     }
+    require( r_nozero_size >0)
     b_r(0 to r_nozero_size - 1)
   }
   
@@ -109,7 +110,7 @@ object PriorDistributions {
     val sigame2 = 1/draw_sigma_r(weight,ss)
     val r = draw_r(pi,k) 
     val b_r = gen_vector_b(r,b)
-    val x_r = gen_oumu_r(r,x)
+    val x_r = gen_matrix_r(r,x)
     var r_nozero_size = 0
     r.foreach(e => if(e != 0.0){
       r_nozero_size = r_nozero_size + 1
@@ -124,9 +125,21 @@ object PriorDistributions {
 
     priorVector
   }
+  
+  def formatMatrix(x:DenseMatrix[Double]): DenseMatrix[Double] = {
+    
+    for(i <- 0 until x.rows)
+      for(j <- 0 until x.cols){
+        val bg = new BigDecimal(x(i,j));
+        val f1 = bg.setScale(10, BigDecimal.ROUND_HALF_UP).doubleValue();
+        
+        x.update(i, j, f1)
+      }
+    
+    x
+  }
     
   
-  def predictive(parameter: Beta.Parameter) = new Polya(Counter(true->parameter._1,false->parameter._2))
   
   def  main(args: Array[String]): Unit={
     
@@ -142,7 +155,10 @@ object PriorDistributions {
 //	  val out = priorDistr(pi,k,b,x,k_n,w,weight,ss)
 //	  println(out)
 	  
-	  val out = new PriorDistributions(pi,k,b,x,k_n,w,weight,ss).draw
-	  println(out)
+//	  val out = new PriorDistributions(pi,k,b,x,k_n,w,weight,ss).draw
+//	  println(out)
+	  
+	  val a = new PosterDistributions(DenseVector(2.0,2.1),pi,4,x,b,k_n,w,weight,ss)
+	  println(a.draw)
   }
 }
