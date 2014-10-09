@@ -1,37 +1,43 @@
 package tx.batesin.timeseries
 import  breeze.stats.distributions._
-
+import breeze.numerics._
 
 object MathModel {
 	
 	val a = new Bernoulli(0.4)                //> a  : breeze.stats.distributions.Bernoulli = Bernoulli(0.4)
 	a.probabilityOf(true)                     //> res0: Double = 0.4
-	a.draw()                                  //> res1: Boolean = false
-	a.draw()                                  //> res2: Boolean = true
+	a.draw()                                  //> res1: Boolean = true
+	a.draw()                                  //> res2: Boolean = false
+	println(a.entropy)                        //> 0.6730116670092565
+	Bernoulli.sufficientStatisticFor(true)    //> res3: breeze.stats.distributions.Bernoulli.SufficientStatistic = SufficientS
+                                                  //| tatistic(1.0,1.0)
+  Bernoulli.likelihoodFunction(new Bernoulli.SufficientStatistic(4,10)).calculate(1)
+                                                  //> res4: (Double, Double) = (Infinity,Infinity)
 	
+                                                  
 	for (i <- 1 to 10){
-		println(a.draw())                 //> false
-                                                  //| true
-                                                  //| false
-                                                  //| false
-                                                  //| false
-                                                  //| true
-                                                  //| true
+		println(a.draw())                 //> true
                                                   //| false
                                                   //| true
                                                   //| false
+                                                  //| true
+                                                  //| true
+                                                  //| true
+                                                  //| false
+                                                  //| true
+                                                  //| true
 	}
 
-	a.mean                                    //> res3: Double = 0.4
+	a.mean                                    //> res5: Double = 0.4
 	
-	a.variance                                //> res4: Double = 0.24
+	a.variance                                //> res6: Double = 0.24
 	
-	a.mode                                    //> res5: Double = 0.0
+	a.mode                                    //> res7: Double = 0.0
 	
-	a.entropy                                 //> res6: Double = 0.6730116670092565
+	a.entropy                                 //> res8: Double = 0.6730116670092565
 	
 	//Beta.Parameter
-	Bernoulli.predictive((3.0,4.0)).draw()    //> res7: Boolean = false
+	Bernoulli.predictive((3.0,4.0)).draw()    //> res9: Boolean = true
 	
 	
 }

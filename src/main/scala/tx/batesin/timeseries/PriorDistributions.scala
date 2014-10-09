@@ -8,7 +8,7 @@ import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicInteger
 import java.math.BigDecimal;
-/** 先验分布采样 */
+
 
 class PriorDistributions(pi: Double,k: Int,b: DenseVector[Double],x:DenseMatrix[Double],k_n: Double,w: Double,weight: Double,ss: Double){
   
@@ -37,7 +37,7 @@ class PriorDistributions(pi: Double,k: Int,b: DenseVector[Double],x:DenseMatrix[
 }
 object PriorDistributions {
   
-  /** p(r)的生成 (r1,r2,...,rk)  */
+  /** p(r)  (r1,r2,...,rk)  */
   def draw_r(pi: Double,k: Int) : DenseVector[Double] = {
     val bernoulli_model = new Bernoulli(pi,new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(System.currentTimeMillis()))))    
     val r_row = DenseVector.zeros[Double](k)
@@ -48,7 +48,7 @@ object PriorDistributions {
   }
   
   
-  /**  p(sigma|r) 生成   1/sigma^2 */
+  /**  p(sigma|r)   1/sigma^2 */
   def draw_sigma_r(weight: Double,ss: Double): Double = {
     val gamma_model = new Gamma(weight/2,2/ss)(new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(System.currentTimeMillis()))))
 
@@ -57,7 +57,7 @@ object PriorDistributions {
   
   
   
-  /** 生成协方差 (oumu^-1)^-1 */
+  /**  (oumu^-1)^-1 */
   def gene_Oumu(x:DenseMatrix[Double],k_n: Double,w: Double): DenseMatrix[Double] = {
     val muti_metrix = x.t * x
     (muti_metrix*w  +  diag(diag(muti_metrix)*(1 - w)))*k_n
@@ -68,7 +68,7 @@ object PriorDistributions {
   def gene_Covariance(x:DenseMatrix[Double],k_n: Double,w: Double,sigma2: Double): DenseMatrix[Double] = {
     inv(gene_Oumu(x,k_n,w))*sigma2
   }
-  /** 生成  P(beta|sigma,r) (beta1,beta2,beta3...betak) */
+  /** P(beta|sigma,r) (beta1,beta2,beta3...betak) */
   def draw_beta_sigmar(mean: DenseVector[Double],covariance : DenseMatrix[Double]): DenseVector[Double] = {
 
   	val mutil_Gaussian_model = MultivariateGaussian(mean,PriorDistributions.formatMatrix(covariance))(new RandBasis(new ThreadLocalRandomGenerator(new MersenneTwister(System.currentTimeMillis()))))
