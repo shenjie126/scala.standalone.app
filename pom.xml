@@ -14,13 +14,53 @@
     <dependency> <!-- Spark dependency -->
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.10</artifactId>
-      <version>1.0.2</version>
+      <version>1.1.0</version>
     </dependency>
+    
     <dependency>
-  		<groupId>org.scalanlp</groupId>
+	<groupId>org.apache.spark</groupId>
+	<artifactId>spark-mllib_2.10</artifactId>
+	<version>1.1.0</version>
+</dependency>
+    <dependency>
+  	     <groupId>org.scalanlp</groupId>
     	<artifactId>breeze_2.10</artifactId> <!-- or 2.11 -->
     	<version>0.8.1</version>
 	</dependency>
+	<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-camel_2.10.0-M7</artifactId>
+	<version>2.1-M2</version>
+</dependency>
+<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-http-core-experimental_2.10</artifactId>
+	<version>0.9</version>
+</dependency>
+<!-- 
+<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-actor_2.11</artifactId>
+	<version>2.2.3</version>
+</dependency>
+
+<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-remote_2.10</artifactId>
+	<version>2.2.3</version>
+</dependency>
+<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-slf4j_2.10</artifactId>
+	<version>2.2.3</version>
+</dependency>
+<dependency>
+	<groupId>com.typesafe.akka</groupId>
+	<artifactId>akka-testkit_2.11</artifactId>
+	<version>2.3.3</version>
+</dependency>
+ -->
+	
   </dependencies>
   
 </project>
